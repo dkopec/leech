@@ -1,10 +1,10 @@
 Package: leech
-Source:
+Source: https://github.com/alekseyt/leech
 Maintainer: Aleksey Tulinov <aleksey.tulinov@gmail.com>
 Section: net
 Priority: Optional
 Version: 0.1-1
 Architecture: all
-Homepage:
+Homepage: https://github.com/alekseyt/leech
 Depends: sed, wget, xsltproc
 Description: RSS-feeds parser/files downloader
