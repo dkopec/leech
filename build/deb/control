@@ -1,0 +1,16 @@
+Package: leech
+Version: 0.1-1
+Section: net
+Priority: optional
+Architecture: all
+Essential: no
+Depends: wget, xsltproc, grep, sed
+Pre-Depends:
+Recommends:
+Suggests:
+Installed-Size: 4096
+Maintainer: Aleksey Tulinov <aleksey.tulinov@gmail.com>
+Conflicts:
+Replaces:
+Provides:
+Description: RSS parser/files downloader

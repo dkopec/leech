@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# Author: Aleksey Tulinov <aleksey.tulinov@gmail.com>
+
+usage() {
+    echo "Usage: $0 \"<FILENAME>\" \"<EXPRESSION>\""
+}
+
+# check arguments count
+#
+if [ $# -lt 2 ]; then
+    usage
+    exit 1
+fi
+
+FILENAME=$1
+EXPRESSION=$2
+
+# try to grep
+#
+# grep returned 0 - match
+#      returned !0 - no match
+#
+echo "$FILENAME" | grep -i -E "$EXPRESSION" >/dev/null
+
+case $? in
+    0)
+        echo "OK, filename matched pattern"
+        exit 0
+        ;;
+    *)
+        echo "No match"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,19 @@
+
+# leech configuration files
+#
+FOODS="$CONFIG_DIR/foods"
+DOWNLOADS="$CONFIG_DIR/downloads"
+
+# XSL transformation
+#
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PARENT_DIR=$(dirname $SCRIPT_DIR)
+XSL_TEMPLATE="$PARENT_DIR/share/leech/leech.xsl"
+
+# Temporary directory
+#
+TMP="/tmp"
+
+# Download options
+#
+DOWNLOAD_DELAY=5 # second(s)

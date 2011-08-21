@@ -1,0 +1,162 @@
+#!/bin/sh
+
+# Author: Aleksey Tulinov <aleksey.tulinov@gmail.com>
+
+usage() {
+    echo "Usage: CONFIG_DIR=\"<DIRECTORY>\" DOWNLOADS_DIR=\"<DIRECTORY>\" $0"
+    echo "Or you could omit DOWNLOADS_DIR to download files to current directory." 
+}
+
+CONFIG="$CONFIG_DIR/default"
+
+if [ ! -f $CONFIG ]; then
+    echo "ERROR: No config file found at $CONFIG"
+    echo
+    usage
+    exit 1
+fi
+
+. $CONFIG
+
+# sanity check
+#
+if [ ! -f "$XSL_TEMPLATE" ]; then
+    echo "ERROR: No XSL template at \"$XSL_TEMPLATE\""
+    echo "You probably need to reinstall leech."
+    exit 1
+fi
+
+if [ ! -f "$FOODS" ]; then
+    echo "ERROR: No feeds file at \"$FOODS\""
+    echo
+    usage
+    exit 1
+fi
+
+if [ ! -f "$DOWNLOADS" ]; then
+    echo "ERROR: No downloads file at \"$DOWNLOADS\""
+    echo
+    usage
+    exit 1
+fi
+
+if [ -z "$DOWNLOADS_DIR" ]; then
+    echo "WARNING: DOWNLOADS_DIR is not set. Assuming it's current directory."
+    DOWNLOADS_DIR=.
+fi
+
+if [ -z "$DOWNLOAD_DELAY" ]; then
+    DOWNLOAD_DELAY=5
+fi
+
+# temporary file with RSS-feed
+LUNCH="$TMP/leech.lunch.$$"
+
+# wget options
+#
+WGET_LUNCH_OPTS="-q" # wget options for downloading lunch
+WGET_DOWNLOADS_OPTS="-q --content-disposition -c -i -" # wget options for downloading files
+# --content-disposition to correctly rip torrent's filename from script like torrents.php?id=xyz
+# -c for not re-downloading torrents
+# -i - : url (passed through stdin as output of xsltproc | grep | sed) 
+
+# misc options
+#
+GREP_OPTS="-i -E" # ignore case, extended regular expressions
+SED_OPTS="-r -e"     # enable extended regular expressions
+SED_REGEX="'s/^.* (.*)$/\1/'" # after XSLT processing, parse pairs "filename\sURL"
+XSLT_OPTS="--novalid" # skip loading DTDs during XSL transformation
+
+# prepare environment
+#
+
+# create tmp dir
+if [ ! -d "$TMP" ]; then
+    echo "WARNING: Temporary directory \"$TMP\" doesn't exist, creating it."
+    mkdir -p "$TMP"
+fi
+
+# remove previous lunch if any
+rm -f "$LUNCH"
+
+# create downloads dir
+if [ ! -z "$DOWNLOADS_DIR" ] && [ ! -d "$DOWNLOADS_DIR" ]; then
+    echo "WARNING: Downloads directory \"$DOWNLOADS_DIR\" doesn't exist, creating it."
+    mkdir -p "$DOWNLOADS_DIR"
+fi
+
+# downloading
+#
+while read FOOD
+do
+    # skip comments and empty strings
+    TAG=$(expr substr "$FOOD" 1 1)
+    case $TAG in
+        '#')
+            continue
+            ;;
+        '')
+            continue
+            ;;
+    esac
+
+    # download lunch
+    #
+    echo -n "Downloading feed: $FOOD... "
+    wget "$FOOD" -O "$LUNCH" $WGET_LUNCH_OPTS
+
+    # don't parse lunch if download failed
+    #
+    case $? in
+        0)
+            echo "OK"
+            ;;
+
+        *)
+            echo "Failed"
+            continue;
+            ;;
+    esac
+ 
+    # search lunch for patterns
+    #
+    while read PATTERN
+    do
+        # skip comments and empty strings
+        TAG=$(expr substr "$PATTERN" 1 1)
+        case $TAG in
+            '#')
+                continue
+                ;;
+            '')
+                continue
+                ;;
+        esac
+
+        URLS=$(xsltproc $XSLT_OPTS "$XSL_TEMPLATE" "$LUNCH" | grep $GREP_OPTS "$PATTERN" | sed $SED_OPTS 's/^.* (.*)$/\1/')
+
+        # download urls if any
+        #
+        if [ ! -z "$URLS" ]; then
+            for URL in $URLS; do
+                echo -n "Downloading file: $URL... "
+
+                sleep $DOWNLOAD_DELAY
+                echo "$URL" | wget -P "$DOWNLOADS_DIR" $WGET_DOWNLOADS_OPTS
+
+                case $? in
+                    0)
+                        echo "OK"
+                        ;;
+                    *)
+                        echo "Failed"
+                        ;;
+                esac
+            done;
+        fi
+    done <"$DOWNLOADS"
+  
+    # cleanup
+    #
+    rm -f "$LUNCH"
+done <"$FOODS"

@@ -1,0 +1,28 @@
+# Filenames matching regular expressions below will be downloaded from
+# feeds you specified in foods-file. Matching is case-insensitive.
+#
+# Usual way to match any string is .*
+#
+# Example 1: 
+#  ubuntu.*amd64.*
+# will match
+#  ubuntu-11.04-desktop-amd64.iso
+#  ubuntu-11.04-server-amd64.iso
+#
+# Example 2: 
+#  ubuntu.*desktop.*amd64.*
+# will match
+#  ubuntu-11.04-desktop-amd64.iso
+# but won't match
+#  ubuntu-11.04-server-amd64.iso
+#
+# Anything which is not an alphabet or digits should be escaped with \
+#
+# Example: \[netbook\ remix\].*ubuntu.*iso
+# But normally you should be fine with: .*netbook.*remix.*ubuntu.*iso
+#
+# You could also use `leech-match-test "<FILENAME>" "<EXPRESSION>"` to check
+# if expression is matching filenames you want it to match.
+#
+
+
