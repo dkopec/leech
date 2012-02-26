@@ -1,70 +1,64 @@
-What is this?
-===
+<h1>What is this?</h1>
 
-A torrent RSS-feed downloader. Based off of alekseyt's code.
+<p>A torrent RSS-feed downloader. Based off of alekseyt's code.</p>
 
-How it works
-===
+<p>leech works by downloading the torrents from a RSS-feed generated from a website.</p>
 
-leech works by downloading the torrents from a RSS-feed generated from a website.
+<p>To do this it uses sh, wget, xsltproc, grep and sed.</p>
 
-To do this it uses sh, wget, xsltproc, grep and sed.
+<p>It works with torrent clients that support directory watching, such as:</p>
 
-It works with torrent clients that support directory watching, such as:
+<ul>
+<li>transmission</li>
+<li>rtorrent</li>
+</ul>
 
-- transmission
-- rtorrent
+<h1>Highlights</h1>
 
-Highlights
-===
+<ul>
+<li>leech does not implement long-running processes, ideal for low memory devices.</li>
+<li>Does not require additional language pakages, written is bash its extemely small.</li>
+<li>Still does the job.</li>
+</ul>
 
-- leech does not implement long-running processes, ideal for low memory devices.
-- Does not require additional language pakages, written is bash its extemely small.
-- Still does the job.
+<h1>Setup</h1>
 
-Setup
-===
-To install:
+<p>To install:</p>
 
-$ opkg install http://downloads.dkopec.ca/leech_*_all.ipk
+<p><code>opkg install http://downloads.dkopec.ca/leech_*_all.ipk</code></p>
 
-Add all of the RSS-Feeds in '/etc/leech/foods'
-Add any Regular Expressions you want applied to the 'foods' in '/etc/leech/downloads'
-(default is to download everything)
+<p>Add all of the RSS-Feeds in <code>/etc/leech/foods</code>
+Add any Regular Expressions you want applied to the 'foods' in <code>/etc/leech/downloads</code>
+(default is to download everything)</p>
 
-Use
-===
+<h1>Use</h1>
 
-To run the program manually:
+<p>To run the program manually:</p>
 
-$ CONFIG_DIR="/etc/leech" DOWLOADS_DIR="/mnt/downloads/" leech
+<p><code>CONFIG_DIR="/etc/leech" DOWLOADS_DIR="/mnt/downloads/" leech</code></p>
 
-DOWNLOADS_DIR can be omitted to download files to current directory.
+<p>DOWNLOADS_DIR can be omitted to download files to current directory.</p>
 
-To make it run every 30 minutes add this entry to crontabs using 'crontab -e':
+<p>To make it run every 30 minutes add this entry to crontabs using <code>crontab -e</code>:</p>
 
-$  */30 * * * * CONFIG_DIR="/etc/leech" DOWNLOADS_DIR="/mnt/downloads" leech
+<p><code>*/30 * * * * CONFIG_DIR="/etc/leech" DOWNLOADS_DIR="/mnt/downloads" leech</code></p>
 
-You can use 'leech-match-test' to test if expressions in
-config/downloads match filenames you need.
+<p>You can use <code>leech-match-test</code> to test if expressions in config/downloads match filenames you need.</p>
 
-Known Issuse
-===
+<h1>Known Issues</h1>
 
-- You need normal wget to make it work. Default OpenWRT's wget rippoff
-won't do.
+<ul>
+<li>You need normal wget to make it work. Default OpenWRT's wget rippoff won't do.</li>
+</ul>
 
-Troubleshooting
-===
+<h1>Troubleshooting</h1>
 
-If you think something is wrong, or just want to make sure if everything is OK,
-you could always run leech in manual mode and observe its output.
+<p>If you think something is wrong, or just want to make sure if everything is OK, you could always run leech in manual mode and observe its output.</p>
 
-Under the Hood
-===
+<h1>Under the Hood</h1>
 
-Script will create temporary file in $TMP (/tmp by default): ``$TMP/leech.lunch``
-- contains downloaded feed.
+<p>Script will create temporary file in $TMP (/tmp by default): <code>$TMP/leech.lunch</code>
+* contains downloaded feed.</p>
 
-Files matched ``config/downloads`` rules goes directly to DOWNLOADS_DIR. In
-case of incomplete file retrieval, wget will resume download.
+<p>Files matched <code>config/downloads</code> rules goes directly to DOWNLOADS_DIR. In
+case of incomplete file retrieval, wget will resume download.</p>
